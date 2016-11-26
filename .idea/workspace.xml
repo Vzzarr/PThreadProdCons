@@ -12,18 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1f96edef-793c-4d90-a45b-5fd6807f5778" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/CUnit/libcunit.a" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main.c" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/temp.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test1" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/test/prova_sito.c" afterPath="$PROJECT_DIR$/test/test.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test" afterPath="$PROJECT_DIR$/test/test" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/HWC1_ProdCons.iml" afterPath="$PROJECT_DIR$/.idea/HWC1_ProdCons.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/buffer_type.c" afterPath="$PROJECT_DIR$/src/buffer_type.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/buffer_type.h" afterPath="$PROJECT_DIR$/src/buffer_type.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/CUnitAutomated-Results.xml" afterPath="$PROJECT_DIR$/test/CUnitAutomated-Results.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.c" afterPath="$PROJECT_DIR$/test/test.c" />
     </list>
     <ignored path="HWC1_ProdCons.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -68,8 +57,8 @@
       <file leaf-file-name="test.c" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="116" column="8" selection-start-line="116" selection-start-column="8" selection-end-line="116" selection-end-column="8" />
+            <state relative-caret-position="105">
+              <caret line="94" column="26" selection-start-line="94" selection-start-column="26" selection-end-line="94" selection-end-column="26" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -434,12 +423,12 @@
       <workItem from="1479992977178" duration="1266000" />
       <workItem from="1480073014526" duration="6197000" />
       <workItem from="1480094645266" duration="10687000" />
-      <workItem from="1480160364515" duration="2588000" />
+      <workItem from="1480160364515" duration="3202000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66664000" />
+    <option name="totallyTimeSpent" value="67278000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
@@ -841,8 +830,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="116" column="8" selection-start-line="116" selection-start-column="8" selection-end-line="116" selection-end-column="8" />
+        <state relative-caret-position="105">
+          <caret line="94" column="26" selection-start-line="94" selection-start-column="26" selection-end-line="94" selection-end-column="26" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

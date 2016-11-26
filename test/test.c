@@ -92,6 +92,7 @@ void test_PPPC(void)
     ar1->buffer = buffer;
     pthread_t pthread1;
 
+    struct arg_struct *ar2;
     ar2->msg = m2;
     ar2->buffer = buffer;
     pthread_t pthread2;
