@@ -1,9 +1,7 @@
 //
 // Created by nicholas on 21/11/16.
 //
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
+
 #include "msg_type.h"
 
 msg_t* msg_init_string(void* content) {

@@ -4,8 +4,11 @@
 
 #ifndef HWC1_PRODCONS_MSG_TYPE_H
 #define HWC1_PRODCONS_MSG_TYPE_H
+#include <pthread.h>
+#include <stdlib.h>
+#include <string.h>
 
-typedef struct msg {
+typedef struct mssg {
     void* content; // generico contenuto del messaggio
     struct msg * (*msg_init)(void*); // creazione msg
     void (*msg_destroy)(struct msg *); // deallocazione msg

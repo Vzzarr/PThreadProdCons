@@ -1,11 +1,5 @@
-#include <stdio.h>
-#include <string.h>
-#include <pthread.h>
 #include "CUnit/Basic.h"
 #include "../src/buffer_type.h"
-#include "../src/buffer_type.c"
-#include "../src/msg_type.h"
-#include "../src/msg_type.c"
 
 /* Pointer to the file used by the tests. */
 static buffer_t* buffer = NULL;
@@ -87,35 +81,29 @@ void test_PPPC(void)
     msg_t* m2 = msg_init_string("maria");
     msg_t* m3 = msg_init_string("Ma.. Ma..");
 
-    struct arg_struct *ar1;
-    ar1->msg = m1;
-    ar1->buffer = buffer;
+    struct arg_struct ar1;
+    ar1.msg = m1;
+    ar1.buffer = buffer;
     pthread_t pthread1;
 
-    struct arg_struct *ar2;
-    ar2->msg = m2;
-    ar2->buffer = buffer;
+    struct arg_struct ar2;
+    ar2.msg = m2;
+    ar2.buffer = buffer;
     pthread_t pthread2;
 
-    struct arg_struct *ar3;
-    ar3->msg = m3;
-    ar3->buffer = buffer;
+    struct arg_struct ar3;
+    ar3.msg = m3;
+    ar3.buffer = buffer;
     pthread_t pthread3;
 
     if (NULL != buffer) {
-        pthread_create(&pthread1, NULL, do_put_bloccante, ar1);
-        pthread_create(&pthread2, NULL, do_put_bloccante, ar2);
-        pthread_create(&pthread3, NULL, do_put_bloccante, ar3);
-        //crea_thread(pthread1, ar1);
-        //crea_thread(pthread2, ar2);
-        //crea_thread(pthread3, ar3);
+        pthread_create(&pthread1, NULL, do_put_bloccante, &ar1);
+        pthread_create(&pthread2, NULL, do_put_bloccante, &ar2);
+        pthread_create(&pthread3, NULL, do_put_bloccante, &ar3);
 
         pthread_join(pthread1, NULL);
         pthread_join(pthread2, NULL);
         pthread_join(pthread3, NULL);
-        //unisci_thread(pthread1);
-        //unisci_thread(pthread2);
-        //unisci_thread(pthread3);
 
         CU_ASSERT(3 == buffer->k);
     }
@@ -174,7 +162,7 @@ int main()
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuitePPPC, "Test P1BE 1", test_PPPC)))
+    if ((NULL == CU_add_test(pSuitePPPC, "Test PPPC", test_PPPC)))
     {
         CU_cleanup_registry();
         return CU_get_error();

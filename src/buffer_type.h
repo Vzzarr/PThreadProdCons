@@ -2,7 +2,6 @@
 // Created by nicholas on 21/11/16.
 //
 #include "msg_type.h"
-#include <pthread.h>
 
 #ifndef HWC1_PRODCONS_BUFFER_TYPE_H
 #define HWC1_PRODCONS_BUFFER_TYPE_H
@@ -14,9 +13,12 @@ typedef struct buffer {
     int k;  //numero di messaggi presenti
     int size;
 
-    pthread_mutex_t* mutex;
-    pthread_cond_t* notEmpty;
-    pthread_cond_t* notFull;
+    pthread_mutex_t mutex;
+    pthread_cond_t notEmpty;
+    pthread_cond_t notFull;
+
+    struct buffer* (*buffer_init)(unsigned int);
+    void (*buffer_destroy)(struct buffer*);
 
 } buffer_t;
 

@@ -1,9 +1,16 @@
 # PThreadProdCons
 ![](http://posix.co.uk/wp-content/uploads/2015/06/Web-Logo2-300x138.png)
 
-to compile, give this command
+Linux Systems:
+to compile this code, set the working directory into the root project and use this command
 
 ```sh
-$ gcc buffer_type.c msg_type.c test.c -o test -lcunit -pthread
+$ gcc src/buffer_type.c src/msg_type.c test/test.c -o exe -lcunit -pthread
 ```
-//TODO
+
+to execute then use this one
+
+
+```sh
+$ ./exe
+```
