@@ -43,6 +43,11 @@ msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
 
 }
 
+void* do_put_bloccante(void* arguments){
+    struct arg_struct *ar = arguments;
+    return put_bloccante(ar->buffer, ar->msg);
+}
+
 msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg){
     //
 }
@@ -64,6 +69,17 @@ msg_t* get_bloccante(buffer_t* buffer){
     return m;
 }
 
+
 msg_t* get_non_bloccante(buffer_t* buffer){
     //
+}
+
+//funzioni necessarie per il testing
+void* crea_thread(pthread_t pthread, void* arguments){
+    struct arg_struct *ar = arguments;
+//    return pthread_create(&pthread, NULL, do_put_bloccante, arguments);
+
+}
+void* unisci_thread(pthread_t pthread){
+//    return pthread_join(pthread, NULL);
 }

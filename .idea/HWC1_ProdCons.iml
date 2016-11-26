@@ -6,9 +6,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/msg_type.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/buffer_type.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/msg_type.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main.c" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test/test.c" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/Console.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/Automated.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/TestRun.h" isTestSource="false" />
@@ -17,6 +14,7 @@
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/TestDB.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/CUError.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/CUnit/CUnit.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

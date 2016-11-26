@@ -20,6 +20,11 @@ typedef struct buffer {
 
 } buffer_t;
 
+struct arg_struct{
+    buffer_t* buffer;
+    msg_t* msg;
+};
+
 #define BUFFER_ERROR (msg_t *) NULL
 
 /* allocazione / deallocazione buf */
@@ -35,6 +40,8 @@ void buffer_destroy(buffer_t* buffer);
 // restituisce il messaggio inserito; N.B.: msg!=null
 msg_t* put_bloccante(buffer_t* buffer, msg_t* msg);
 
+void* do_put_bloccante(void* arguments);
+
 // inserimento non bloccante: restituisce BUFFER_ERROR se pieno,
 // altrimenti effettua l’inserimento e restituisce il messaggio
 // inserito; N.B.: msg!=null
@@ -47,5 +54,11 @@ msg_t* get_bloccante(buffer_t* buffer);
 // estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
 // ed il valore estratto in caso contrario
 msg_t* get_non_bloccante(buffer_t* buffer);
+
+//funzioni necessarie per il testing
+void* crea_thread(pthread_t pthread1, void* arguments);
+void* unisci_thread(pthread_t pthread);
+
+
 
 #endif //HWC1_PRODCONS_BUFFER_TYPE_H
