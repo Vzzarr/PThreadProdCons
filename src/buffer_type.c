@@ -29,7 +29,6 @@ void buffer_destroy(buffer_t* buffer){
 }
 
 msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
-    msg_t* m;
     pthread_mutex_lock(&(buffer->mutex));
 
     while (buffer->k == buffer->size)
@@ -38,6 +37,7 @@ msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
     buffer->d = (buffer->d + 1) % buffer->size; //incremento d in modo circolare
     buffer->k++;                                //incremento il numero di messaggi presenti
 
+    printf("Inserisco...");
     pthread_cond_signal(&buffer->notEmpty);
 
     pthread_mutex_unlock(&buffer->mutex);
@@ -50,20 +50,38 @@ void* do_put_bloccante(void* arguments){
     return put_bloccante(ar->buffer, ar->msg);
 }
 
+// inserimento non bloccante: restituisce BUFFER_ERROR se pieno,
+// altrimenti effettua l’inserimento e restituisce il messaggio
+// inserito; N.B.: msg!=null
 msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg){
-    //
-    return NULL;
+    pthread_mutex_lock(&(buffer->mutex));
+    if (buffer->k == buffer->size){
+        pthread_mutex_unlock(&buffer->mutex);
+        return BUFFER_ERROR;
+    }
+    buffer->cells[buffer->d] = *msg;
+    buffer->d = (buffer->d + 1) % buffer->size;
+    buffer->k++;
+
+    pthread_mutex_unlock(&buffer->mutex);
+    return msg;
 }
 
 msg_t* get_bloccante(buffer_t* buffer){
     msg_t* m;
+
     pthread_mutex_lock(&buffer->mutex);
 
-    while (buffer->k == 0)
+    while (buffer->k == 0){
+        printf("prova...");
         pthread_cond_wait(&buffer->notEmpty, &buffer->mutex);
+    }
+
     *m = buffer->cells[buffer->t];
     buffer->t = (buffer->t + 1) % buffer->size;
     buffer->k--;
+
+    printf("Prelevo...");
 
     pthread_cond_signal(&buffer->notFull);
 
@@ -72,7 +90,25 @@ msg_t* get_bloccante(buffer_t* buffer){
     return m;
 }
 
+void* do_get_bloccante(buffer_t* buffer){
+    return get_bloccante(buffer);
+}
 
+// estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
+// ed il valore estratto in caso contrario
 msg_t* get_non_bloccante(buffer_t* buffer){
-    //
+    msg_t* m;
+
+    pthread_mutex_lock(&buffer->mutex);
+    if (buffer->k == 0){
+        pthread_mutex_unlock(&buffer->mutex);
+        return BUFFER_ERROR;
+
+    }
+    *m = buffer->cells[buffer->t];
+    buffer->t = (buffer->t + 1) % buffer->size;
+    buffer->k--;
+    pthread_mutex_unlock(&buffer->mutex);
+
+    return m;
 }

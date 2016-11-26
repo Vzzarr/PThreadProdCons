@@ -6,6 +6,7 @@
 #define HWC1_PRODCONS_MSG_TYPE_H
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef struct mssg {
