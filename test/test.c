@@ -145,6 +145,8 @@ void test_PPPC(void)
 
     msg_t* msg_get1 = NULL;
     msg_t* msg_get2 = NULL;
+    char * str1 = NULL;
+    char * str2 = NULL;
 
     struct arg_struct ar1;
     ar1.msg = m1;
@@ -166,24 +168,85 @@ void test_PPPC(void)
     if (NULL != buffer) {
         pthread_create(&pthread1p, NULL, do_put_bloccante, (void*)&ar1);
         pthread_create(&pthread2p, NULL, do_put_bloccante, (void*)&ar2);
-        pthread_create(&pthread3p, NULL, do_put_bloccante, (void*)&ar3);
+        //pthread_create(&pthread3p, NULL, do_put_bloccante, (void*)&ar3);
+
         pthread_create(&pthread1c, NULL, do_get_bloccante, (void*)&ar1);
         pthread_create(&pthread2c, NULL, do_get_bloccante, (void*)&ar2);
 
         pthread_join(pthread1p, NULL);
         pthread_join(pthread2p, NULL);
-        pthread_join(pthread3p, NULL);
+        //pthread_join(pthread3p, NULL);
         pthread_join(pthread1c, (void*)&msg_get1);
         pthread_join(pthread2c, (void*)&msg_get2);
 
-        char * res1 = m1->content;
-        printf("%s", res1);
 
+//        printf(m1->content);
+        printf(msg_get1->content);
+        printf(msg_get2->content);
+
+
+        int i = strcmp(m1->content, msg_get1->content);
+        //printf("%d", i);
+
+        //CU_ASSERT(0 == i);          //controllo messaggio scritto con quelo letto
         CU_ASSERT(1 == buffer->k);
     }
 }
 
+/*_____________________________________________________________*/
+//Non Bloccante
 
+int init_suite_NB(void)   //NB
+{
+    if (NULL == (buffer = buffer_init(2))) {
+        return -1;
+    }
+    else {
+        return 0;
+    }
+}
+
+void test_NB(void)
+{
+    msg_t* m1 = msg_init_string("MARIO");
+    msg_t* m2 = msg_init_string("maria");
+    msg_t* m3 = msg_init_string("Ma.. Ma..");
+
+    msg_t* msg_get1 = NULL;
+    msg_t* msg_get2 = NULL;
+
+    struct arg_struct ar1;
+    ar1.msg = m1;
+    ar1.buffer = buffer;
+    pthread_t pthread1p;
+    pthread_t pthread1c;
+
+    struct arg_struct ar2;
+    ar2.msg = m2;
+    ar2.buffer = buffer;
+    pthread_t pthread2p;
+    pthread_t pthread2c;
+
+    struct arg_struct ar3;
+    ar3.msg = m3;
+    ar3.buffer = buffer;
+    pthread_t pthread3p;
+
+    if (NULL != buffer) {
+        pthread_create(&pthread1p, NULL, do_put_non_bloccante, (void*)&ar1);
+        pthread_create(&pthread2p, NULL, do_put_non_bloccante, (void*)&ar2);
+        pthread_create(&pthread3p, NULL, do_put_non_bloccante, (void*)&ar3);
+
+        pthread_join(pthread1p, NULL);
+        pthread_join(pthread2p, NULL);
+        pthread_join(pthread3p, NULL);
+
+        //char* res1 = m1->content;
+        //printf("%s", res1);
+
+        CU_ASSERT(1 == buffer->k);
+    }
+}
 
 
 
@@ -197,13 +260,14 @@ int main()
     CU_pSuite pSuiteP1BE = NULL;
     CU_pSuite pSuitePP = NULL;
     CU_pSuite pSuitePPPC = NULL;
+    CU_pSuite pSuiteNB = NULL;
 
     /* initialize the CUnit test registry */
     if (CUE_SUCCESS != CU_initialize_registry())
         return CU_get_error();
 
     /*_________________________BufferSize____________________________________*/
-    pSuiteSize = CU_add_suite("Suite_1", init_suite_bufferSize, clean_suite);
+    pSuiteSize = CU_add_suite("Suite_1 - BL", init_suite_bufferSize, clean_suite);
     if (NULL == pSuiteSize) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -217,7 +281,7 @@ int main()
 
     /*_____________________________________________________________*/
     //•1 (P=1; C=0; N=1) Produzione di un solo messaggio in un buffer vuoto
-    pSuiteP1BE = CU_add_suite("Suite_2", init_suite_P1BE, clean_suite);
+    pSuiteP1BE = CU_add_suite("Suite_2 BL", init_suite_P1BE, clean_suite);
     if (NULL == pSuiteP1BE) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -230,8 +294,8 @@ int main()
         return CU_get_error();
     }
 
-    /*_____________________più produttori TODO________________________________________*/
-    pSuitePP = CU_add_suite("Suite_3", init_suite_PP, clean_suite);
+    /*_____________________più produttori________________________________________*/
+    pSuitePP = CU_add_suite("Suite_3 BL", init_suite_PP, clean_suite);
     if (NULL == pSuitePP) {
         CU_cleanup_registry();
         return CU_get_error();
@@ -250,13 +314,26 @@ int main()
 
 
     /*_____________________più produttori_più consumatori________________________________________*/
-    pSuitePPPC = CU_add_suite("Suite_4", init_suite_PPPC, clean_suite);
+    pSuitePPPC = CU_add_suite("Suite_4 - BL", init_suite_PPPC, clean_suite);
     if (NULL == pSuitePPPC) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
     if ((NULL == CU_add_test(pSuitePPPC, "Test PPPC", test_PPPC)))
+    {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    /*_____________________NB-più produttori_più consumatori________________________________________*/
+    pSuiteNB = CU_add_suite("Suite_1 - NB", init_suite_NB, clean_suite);
+    if (NULL == pSuiteNB) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if ((NULL == CU_add_test(pSuiteNB, "Test NB", test_NB)))
     {
         CU_cleanup_registry();
         return CU_get_error();

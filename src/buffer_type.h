@@ -45,6 +45,7 @@ void* do_put_bloccante(void* arguments);
 // altrimenti effettua l’inserimento e restituisce il messaggio
 // inserito; N.B.: msg!=null
 msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg);
+void* do_put_non_bloccante(void* arguments);
 
 // estrazione bloccante: sospende se vuoto, quindi
 // restituisce il valore estratto non appena disponibile
@@ -54,5 +55,6 @@ void* do_get_bloccante(void* arguments);
 // estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
 // ed il valore estratto in caso contrario
 msg_t* get_non_bloccante(buffer_t* buffer);
+void* do_get_non_bloccante(void* arguments);
 
 #endif //HWC1_PRODCONS_BUFFER_TYPE_H

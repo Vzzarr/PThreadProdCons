@@ -37,16 +37,17 @@ msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
     buffer->d = (buffer->d + 1) % buffer->size; //incremento d in modo circolare
     buffer->k++;                                //incremento il numero di messaggi presenti
 
-    pthread_cond_signal(&buffer->notEmpty);
+    printf("Put: %s\n", msg->content);
 
+    pthread_cond_signal(&buffer->notEmpty);
     pthread_mutex_unlock(&buffer->mutex);
 
     return msg;
 }
-
 void* do_put_bloccante(void* arguments){
     struct arg_struct *ar = arguments;
-    return put_bloccante(ar->buffer, ar->msg);
+    msg_t* m = put_bloccante(ar->buffer, ar->msg);
+    return &m;
 }
 
 // inserimento non bloccante: restituisce BUFFER_ERROR se pieno,
@@ -65,6 +66,11 @@ msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg){
     pthread_mutex_unlock(&buffer->mutex);
     return msg;
 }
+void* do_put_non_bloccante(void* arguments){
+    struct arg_struct *ar = arguments;
+    return (void*) put_non_bloccante(ar->buffer, ar->msg);
+}
+
 
 msg_t* get_bloccante(buffer_t* buffer){
     msg_t* m = NULL;
@@ -78,16 +84,17 @@ msg_t* get_bloccante(buffer_t* buffer){
     m = &buffer->cells[buffer->t];
     buffer->t = (buffer->t + 1) % buffer->size;
     buffer->k--;
+    printf("Get: %s\n", m->content);
 
     pthread_cond_signal(&buffer->notFull);
     pthread_mutex_unlock(&buffer->mutex);
 
-    return &m;
+    return m;
 }
-
 void* do_get_bloccante(void* arguments){
     struct arg_struct *ar = arguments;
-    return get_bloccante(ar->buffer);
+    msg_t* m = get_bloccante(ar->buffer);
+    pthread_exit(m);
 }
 
 // estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
@@ -108,3 +115,8 @@ msg_t* get_non_bloccante(buffer_t* buffer){
 
     return m;
 }
+void* do_get_non_bloccante(void* arguments){
+    struct arg_struct *ar = arguments;
+    return (void*) get_non_bloccante(ar->buffer);
+}
+
