@@ -164,22 +164,20 @@ void test_PPPC(void)
     pthread_t pthread3p;
 
     if (NULL != buffer) {
-        /*pthread_create(&pthread1p, NULL, do_put_bloccante, &ar1);
-        pthread_join(pthread1p, NULL);*/
+        pthread_create(&pthread1p, NULL, do_put_bloccante, (void*)&ar1);
+        pthread_create(&pthread2p, NULL, do_put_bloccante, (void*)&ar2);
+        pthread_create(&pthread3p, NULL, do_put_bloccante, (void*)&ar3);
+        pthread_create(&pthread1c, NULL, do_get_bloccante, (void*)&ar1);
+        pthread_create(&pthread2c, NULL, do_get_bloccante, (void*)&ar2);
 
-        pthread_create(&pthread1c, NULL, &do_get_bloccante, buffer);
-        pthread_join(pthread1c, &msg_get1);
-
-        pthread_create(&pthread2p, NULL, &do_put_bloccante, &ar2);
+        pthread_join(pthread1p, NULL);
         pthread_join(pthread2p, NULL);
-
-
-
-        /*pthread_create(&pthread3p, NULL, do_put_bloccante, &ar3);
         pthread_join(pthread3p, NULL);
+        pthread_join(pthread1c, (void*)&msg_get1);
+        pthread_join(pthread2c, (void*)&msg_get2);
 
-        pthread_create(&pthread2c, NULL, do_get_bloccante, &buffer);
-        pthread_join(pthread2c, NULL);*/
+        char * res1 = m1->content;
+        printf("%s", res1);
 
         CU_ASSERT(1 == buffer->k);
     }
@@ -271,6 +269,8 @@ int main()
     CU_cleanup_registry();
     return CU_get_error();
 }
+
+
 //• (P=1; C=0; N=1) Produzione in un buffer pieno
 
 //• (P=0; C=1; N=1) Consumazione da un buffer vuoto

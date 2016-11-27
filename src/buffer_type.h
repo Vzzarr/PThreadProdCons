@@ -49,7 +49,7 @@ msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg);
 // estrazione bloccante: sospende se vuoto, quindi
 // restituisce il valore estratto non appena disponibile
 msg_t* get_bloccante(buffer_t* buffer);
-void* do_get_bloccante(buffer_t* buffer);
+void* do_get_bloccante(void* arguments);
 
 // estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
 // ed il valore estratto in caso contrario
