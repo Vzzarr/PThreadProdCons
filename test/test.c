@@ -233,6 +233,15 @@ void test_PPPC(void)    //non possono essere fatte assunzioni sui messaggi letti
 }
 
 /*_____________________________________________________________*/
+
+//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer non si riempe
+//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer pieno; il buffer è già saturo
+//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
+//• (P=0; C>1; N>1) Consumazione concorrente di molteplici messaggi da un buffer pieno
+
+
+
+/*_____________________________________________________________*/
 //Non Bloccante
 
 //• (P>1; C=0; N=1) Produzione concorrente di molteplici messaggi in un buffer unitario vuoto
@@ -279,39 +288,30 @@ void test_NB_PP(void)   //più produttori, di cui uno tenta di scrivere a buffer
 //• (P=0; C>1; N=1) Consumazione concorrente di molteplici messaggi da un buffer unitario pieno
 void test_NB_PC(void)   //più consumatori, di cui uno tenta di leggere a buffer vuoto
 {
-    msg_t* m1 = msg_init_string("MARIO");
-    msg_t* m2 = msg_init_string("maria");
-    msg_t* m3 = msg_init_string("Ma.. Ma..");
-
     msg_t* msg_get1 = NULL;
     msg_t* msg_get2 = NULL;
     msg_t* msg_get3 = NULL;
 
     struct arg_struct ar1;
-    ar1.msg = m1;
     ar1.buffer = buffer;
-    pthread_t pthread1p;
     pthread_t pthread1c;
 
     struct arg_struct ar2;
-    ar2.msg = m2;
     ar2.buffer = buffer;
-    pthread_t pthread2p;
     pthread_t pthread2c;
 
     struct arg_struct ar3;
-    ar3.msg = m3;
     ar3.buffer = buffer;
-    pthread_t pthread3p;
+    pthread_t pthread3c;
 
     if (NULL != buffer) {
-        pthread_create(&pthread1p, NULL, do_put_non_bloccante, (void*)&ar1);
-        pthread_create(&pthread2p, NULL, do_put_non_bloccante, (void*)&ar2);
-        pthread_create(&pthread3p, NULL, do_put_non_bloccante, (void*)&ar3);
+        pthread_create(&pthread1c, NULL, do_get_non_bloccante, (void*)&ar1);
+        pthread_create(&pthread2c, NULL, do_get_non_bloccante, (void*)&ar2);
+        pthread_create(&pthread3c, NULL, do_get_non_bloccante, (void*)&ar3);
 
-        pthread_join(pthread1p, (void*)&msg_get1);
-        pthread_join(pthread2p, (void*)&msg_get2);
-        pthread_join(pthread3p, (void*)&msg_get3);
+        pthread_join(pthread1c, (void*)&msg_get1);
+        pthread_join(pthread2c, (void*)&msg_get2);
+        pthread_join(pthread3c, (void*)&msg_get3);
 
         CU_ASSERT((msg_get1 == BUFFER_ERROR) || (msg_get2 == BUFFER_ERROR) || (msg_get3 == BUFFER_ERROR))
     }
@@ -434,10 +434,7 @@ int main()
 
 
 
-• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer non si riempe
-• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer pieno; il buffer è già saturo
-• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
-• (P=0; C>1; N>1) Consumazione concorrente di molteplici messaggi da un buffer pieno
+
 
 • (P>1; C>1; N=1) Consumazioni e produzioni concorrenti di molteplici messaggi in un buffer unitario
 • (P>1; C>1; N>1) Consumazioni e produzioni concorrenti di molteplici messaggi in un buffer
