@@ -37,8 +37,6 @@ msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
     buffer->d = (buffer->d + 1) % buffer->size; //incremento d in modo circolare
     buffer->k++;                                //incremento il numero di messaggi presenti
 
-    printf("Put: %s\n", msg->content);
-
     pthread_cond_signal(&buffer->notEmpty);
     pthread_mutex_unlock(&buffer->mutex);
 
@@ -47,7 +45,7 @@ msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
 void* do_put_bloccante(void* arguments){
     struct arg_struct *ar = arguments;
     msg_t* m = put_bloccante(ar->buffer, ar->msg);
-    return &m;
+    pthread_exit(&m);
 }
 
 // inserimento non bloccante: restituisce BUFFER_ERROR se pieno,
@@ -68,7 +66,8 @@ msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg){
 }
 void* do_put_non_bloccante(void* arguments){
     struct arg_struct *ar = arguments;
-    return (void*) put_non_bloccante(ar->buffer, ar->msg);
+    msg_t* m = put_non_bloccante(ar->buffer, ar->msg);
+    pthread_exit(m);
 }
 
 
@@ -84,7 +83,6 @@ msg_t* get_bloccante(buffer_t* buffer){
     m = &buffer->cells[buffer->t];
     buffer->t = (buffer->t + 1) % buffer->size;
     buffer->k--;
-    printf("Get: %s\n", m->content);
 
     pthread_cond_signal(&buffer->notFull);
     pthread_mutex_unlock(&buffer->mutex);
@@ -100,15 +98,14 @@ void* do_get_bloccante(void* arguments){
 // estrazione non bloccante: restituisce BUFFER_ERROR se vuoto
 // ed il valore estratto in caso contrario
 msg_t* get_non_bloccante(buffer_t* buffer){
-    msg_t* m;
+    msg_t* m = NULL;
 
     pthread_mutex_lock(&buffer->mutex);
     if (buffer->k == 0){
         pthread_mutex_unlock(&buffer->mutex);
         return BUFFER_ERROR;
-
     }
-    *m = buffer->cells[buffer->t];
+    m = &buffer->cells[buffer->t];
     buffer->t = (buffer->t + 1) % buffer->size;
     buffer->k--;
     pthread_mutex_unlock(&buffer->mutex);
@@ -117,6 +114,7 @@ msg_t* get_non_bloccante(buffer_t* buffer){
 }
 void* do_get_non_bloccante(void* arguments){
     struct arg_struct *ar = arguments;
-    return (void*) get_non_bloccante(ar->buffer);
+    msg_t* m = get_non_bloccante(ar->buffer);
+    pthread_exit(m);
 }
 

@@ -137,7 +137,7 @@ int init_suite_PPPC(void)   //più produttori_più consumatori
     }
 }
 
-void test_PPPC(void)
+void test_PPPC(void)    //non possono essere fatte assunzioni sui messaggi letti
 {
     msg_t* m1 = msg_init_string("MARIO");
     msg_t* m2 = msg_init_string("maria");
@@ -145,8 +145,6 @@ void test_PPPC(void)
 
     msg_t* msg_get1 = NULL;
     msg_t* msg_get2 = NULL;
-    char * str1 = NULL;
-    char * str2 = NULL;
 
     struct arg_struct ar1;
     ar1.msg = m1;
@@ -168,24 +166,21 @@ void test_PPPC(void)
     if (NULL != buffer) {
         pthread_create(&pthread1p, NULL, do_put_bloccante, (void*)&ar1);
         pthread_create(&pthread2p, NULL, do_put_bloccante, (void*)&ar2);
-        //pthread_create(&pthread3p, NULL, do_put_bloccante, (void*)&ar3);
+        pthread_create(&pthread3p, NULL, do_put_bloccante, (void*)&ar3);
 
         pthread_create(&pthread1c, NULL, do_get_bloccante, (void*)&ar1);
         pthread_create(&pthread2c, NULL, do_get_bloccante, (void*)&ar2);
 
         pthread_join(pthread1p, NULL);
         pthread_join(pthread2p, NULL);
-        //pthread_join(pthread3p, NULL);
+        pthread_join(pthread3p, NULL);
         pthread_join(pthread1c, (void*)&msg_get1);
         pthread_join(pthread2c, (void*)&msg_get2);
 
-
-//        printf(m1->content);
-        printf(msg_get1->content);
-        printf(msg_get2->content);
-
-
-        int i = strcmp(m1->content, msg_get1->content);
+        //printf(m1->content);
+        //printf(msg_get1->content);
+        //printf(msg_get2->content);
+        //int i = strcmp(m1->content, msg_get1->content);
         //printf("%d", i);
 
         //CU_ASSERT(0 == i);          //controllo messaggio scritto con quelo letto
@@ -206,7 +201,7 @@ int init_suite_NB(void)   //NB
     }
 }
 
-void test_NB(void)
+void test_NB_PP(void)   //più produttori, di cui uno tenta di scrivere a buffer pieno
 {
     msg_t* m1 = msg_init_string("MARIO");
     msg_t* m2 = msg_init_string("maria");
@@ -214,6 +209,7 @@ void test_NB(void)
 
     msg_t* msg_get1 = NULL;
     msg_t* msg_get2 = NULL;
+    msg_t* msg_get3 = NULL;
 
     struct arg_struct ar1;
     ar1.msg = m1;
@@ -237,16 +233,48 @@ void test_NB(void)
         pthread_create(&pthread2p, NULL, do_put_non_bloccante, (void*)&ar2);
         pthread_create(&pthread3p, NULL, do_put_non_bloccante, (void*)&ar3);
 
-        pthread_join(pthread1p, NULL);
-        pthread_join(pthread2p, NULL);
-        pthread_join(pthread3p, NULL);
+        pthread_join(pthread1p, (void*)&msg_get1);
+        pthread_join(pthread2p, (void*)&msg_get2);
+        pthread_join(pthread3p, (void*)&msg_get3);
 
-        //char* res1 = m1->content;
-        //printf("%s", res1);
-
-        CU_ASSERT(1 == buffer->k);
+        CU_ASSERT((msg_get1 == BUFFER_ERROR) || (msg_get2 == BUFFER_ERROR) || (msg_get3 == BUFFER_ERROR))
     }
 }
+
+void test_NB_PC(void)   //più consumatori, di cui uno tenta di leggere a buffer vuoto
+{
+    msg_t* msg_get1 = NULL;
+    msg_t* msg_get2 = NULL;
+    msg_t* msg_get3 = NULL;
+
+    struct arg_struct ar1;
+    ar1.buffer = buffer;
+    pthread_t pthread1p;
+    pthread_t pthread1c;
+
+    struct arg_struct ar2;
+    ar2.buffer = buffer;
+    pthread_t pthread2p;
+    pthread_t pthread2c;
+
+    struct arg_struct ar3;
+    ar3.buffer = buffer;
+    pthread_t pthread3p;
+
+    if (NULL != buffer) {
+        pthread_create(&pthread1p, NULL, do_get_non_bloccante, (void*)&ar1);
+        pthread_create(&pthread2p, NULL, do_get_non_bloccante, (void*)&ar2);
+        pthread_create(&pthread3p, NULL, do_get_non_bloccante, (void*)&ar3);
+
+        pthread_join(pthread1p, (void*)&msg_get1);
+        pthread_join(pthread2p, (void*)&msg_get2);
+        pthread_join(pthread3p, (void*)&msg_get3);
+
+        CU_ASSERT((msg_get1 == BUFFER_ERROR) || (msg_get2 == BUFFER_ERROR) || (msg_get3 == BUFFER_ERROR))
+    }
+}
+
+
 
 
 
@@ -301,16 +329,13 @@ int main()
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuitePP, "Test PP1", test_PP1)))
+    if ((NULL == CU_add_test(pSuitePP, "Test PP1", test_PP1)) ||
+        (NULL == CU_add_test(pSuitePP, "Test PP2", test_PP2)))
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    if ((NULL == CU_add_test(pSuitePP, "Test PP2", test_PP2)))
-    {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
+
 
 
     /*_____________________più produttori_più consumatori________________________________________*/
@@ -333,7 +358,8 @@ int main()
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuiteNB, "Test NB", test_NB)))
+    if ((NULL == CU_add_test(pSuiteNB, "Test NB - PP", test_NB_PP)) ||
+        (NULL == CU_add_test(pSuiteNB, "Test NB - PC", test_NB_PC)))//TODO
     {
         CU_cleanup_registry();
         return CU_get_error();
