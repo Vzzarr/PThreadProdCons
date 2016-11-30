@@ -36,7 +36,6 @@ void test_bufferSize(void)
 
 /*_____________________________________________________________*/
 //•1 (P=1; C=0; N=1) Produzione di un solo messaggio in un buffer vuoto
-
 void test_P1BE(void)
 {
     msg_t* m = msg_init_string("Mario");
@@ -55,7 +54,7 @@ void test_P1BF(void) {
 }
 
 //• (P=0; C=1; N=1) Consumazione di un solo messaggio da un buffer pieno
-void test_C1_N1(void){
+void test_C1N1(void){
     if (NULL != buffer) {
         get_bloccante(buffer);
         CU_ASSERT(0 == buffer->k)
@@ -126,6 +125,7 @@ int init_suite_PP(void)   //più produttori
     }
 }
 
+//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer non si riempe
 void test_PP1(void)
 {
     msg_t* m1 = msg_init_string("MARIO");
@@ -234,7 +234,6 @@ void test_PPPC(void)    //non possono essere fatte assunzioni sui messaggi letti
 
 /*_____________________________________________________________*/
 
-//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer non si riempe
 //• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer pieno; il buffer è già saturo
 //• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
 //• (P=0; C>1; N>1) Consumazione concorrente di molteplici messaggi da un buffer pieno
@@ -259,13 +258,11 @@ void test_NB_PP(void)   //più produttori, di cui uno tenta di scrivere a buffer
     ar1.msg = m1;
     ar1.buffer = buffer;
     pthread_t pthread1p;
-    pthread_t pthread1c;
 
     struct arg_struct ar2;
     ar2.msg = m2;
     ar2.buffer = buffer;
     pthread_t pthread2p;
-    pthread_t pthread2c;
 
     struct arg_struct ar3;
     ar3.msg = m3;
@@ -342,13 +339,13 @@ int main()
         return CU_get_error();
 
     /*_________________________BufferSize____________________________________*/
-    pSuiteSize = CU_add_suite("Suite_1 - BL", init_suite_B1, clean_suite);
+    pSuiteSize = CU_add_suite("Suite_1 BL - Base", init_suite_B1, clean_suite);
     if (NULL == pSuiteSize) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if (NULL == CU_add_test(pSuiteSize, "Test Buffer Size 1", test_bufferSize))
+    if (NULL == CU_add_test(pSuiteSize, "Buffer Size == 1", test_bufferSize))
     {
         CU_cleanup_registry();
         return CU_get_error();
@@ -361,8 +358,8 @@ int main()
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuiteP1BE, "Test P1BE", test_P1BE)) ||
-         (NULL == CU_add_test(pSuiteP1BE, "Test C1N1", test_C1_N1)))
+    if ((NULL == CU_add_test(pSuiteP1BE, "1 Produttore - Buffer unitario vuoto", test_P1BE)) ||
+         (NULL == CU_add_test(pSuiteP1BE, "1 Consumatore - Buffer unitario pieno", test_C1N1)))
     {
         CU_cleanup_registry();
         return CU_get_error();
@@ -375,49 +372,49 @@ int main()
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuiteCPC, "Test CPC_C", test_CPC_C)) ||
-        (NULL == CU_add_test(pSuiteCPC, "Test CPC_P", test_CPC_P)))
+    if ((NULL == CU_add_test(pSuiteCPC, "1 Consumatore e 1 Produttore concorrenti - Buffer unitario vuoto", test_CPC_C)) ||
+        (NULL == CU_add_test(pSuiteCPC, "1 Produttore e 1 Consumatore concorrenti - Buffer unitario vuoto", test_CPC_P)))
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
     /*_____________________più produttori________________________________________*/
-    pSuitePP = CU_add_suite("Suite_4 BL", init_suite_PP, clean_suite);
+    pSuitePP = CU_add_suite("Suite_4 BL - Più Produttori", init_suite_PP, clean_suite);
     if (NULL == pSuitePP) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuitePP, "Test PP1", test_PP1)) ||
-        (NULL == CU_add_test(pSuitePP, "Test PP2", test_PP2)))
+    if ((NULL == CU_add_test(pSuitePP, "2 Produttori concorrenti - Buffer dim 3 vuoto", test_PP1)) ||
+        (NULL == CU_add_test(pSuitePP, "1 Produttore concorrente - Buffer dim 3 con 2 msg", test_PP2)))
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
     /*_____________________più produttori_più consumatori________________________________________*/
-    pSuitePPPC = CU_add_suite("Suite_5 - BL", init_suite_PPPC, clean_suite);
+    pSuitePPPC = CU_add_suite("Suite_5 BL - Più Produttori e Più Consumatori", init_suite_PPPC, clean_suite);
     if (NULL == pSuitePPPC) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuitePPPC, "Test PPPC", test_PPPC)))
+    if ((NULL == CU_add_test(pSuitePPPC, "3 Produttori e 2 Consumatori concorrenti - Buffer dim 2 vuoto", test_PPPC)))
     {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
     /*_____________________NB-più produttori_più consumatori________________________________________*/
-    pSuiteNB = CU_add_suite("Suite_1 - NB", init_suite_B1, clean_suite);
+    pSuiteNB = CU_add_suite("Suite_1 NB -", init_suite_B1, clean_suite);
     if (NULL == pSuiteNB) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if ((NULL == CU_add_test(pSuiteNB, "Test NB - PP", test_NB_PP)) ||
-        (NULL == CU_add_test(pSuiteNB, "Test NB - PC", test_NB_PC)))
+    if ((NULL == CU_add_test(pSuiteNB, "Più Produttori concorrenti - Buffer unitario vuoto", test_NB_PP)) ||
+        (NULL == CU_add_test(pSuiteNB, "Più Consumatori concorrenti - Buffer unitario vuoto", test_NB_PC)))
     {
         CU_cleanup_registry();
         return CU_get_error();
