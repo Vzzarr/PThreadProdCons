@@ -232,10 +232,73 @@ void test_PPPC(void)    //non possono essere fatte assunzioni sui messaggi letti
     }
 }
 
-/*_____________________________________________________________*/
+/*__________________________6___________________________________*/
+
+//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
+int test_RiempiBuffer(void)   //più produttori_più consumatori
+{
+    msg_t* m1 = msg_init_string("MARIO");
+
+    struct arg_struct ar1;
+    ar1.msg = m1;
+    ar1.buffer = buffer;
+    pthread_t pthread1p;
+
+    struct arg_struct ar2;
+    ar2.msg = m1;
+    ar2.buffer = buffer;
+    pthread_t pthread2p;
+
+    if (NULL != buffer) {
+        CU_ASSERT(buffer->k == 0);
+
+        pthread_create(&pthread1p, NULL, do_put_bloccante, (void*)&ar1);
+        pthread_create(&pthread2p, NULL, do_put_bloccante, (void*)&ar2);
+
+        pthread_join(pthread1p, NULL);
+        pthread_join(pthread2p, NULL);
+
+        CU_ASSERT(buffer->k == 2);
+    }
+}
 
 //• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer pieno; il buffer è già saturo
-//• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
+int test_PW(void)   //più produttori_più consumatori
+{
+    msg_t* m1 = msg_init_string("MARIO");
+
+    struct arg_struct ar1;
+    ar1.msg = m1;
+    ar1.buffer = buffer;
+    pthread_t pthread1p;
+    pthread_t pthread1c;
+
+
+    struct arg_struct ar2;
+    ar2.msg = m1;
+    ar2.buffer = buffer;
+    pthread_t pthread2p;
+    pthread_t pthread2c;
+
+
+    if (NULL != buffer) {
+
+        pthread_create(&pthread1p, NULL, do_put_bloccante, (void*)&ar1);
+        pthread_create(&pthread2p, NULL, do_put_bloccante, (void*)&ar2);
+
+        CU_ASSERT(buffer->k == 2);
+
+        pthread_create(&pthread1c, NULL, do_get_bloccante, (void*)&ar1);
+        pthread_create(&pthread2c, NULL, do_get_bloccante, (void*)&ar2);
+
+        pthread_join(pthread1p, NULL);
+        pthread_join(pthread2p, NULL);
+        pthread_join(pthread1c, NULL);
+        pthread_join(pthread2c, NULL);
+
+        CU_ASSERT(buffer->k == 2);
+    }
+}
 //• (P=0; C>1; N>1) Consumazione concorrente di molteplici messaggi da un buffer pieno
 
 
@@ -332,6 +395,7 @@ int main()
     CU_pSuite pSuiteCPC = NULL;
     CU_pSuite pSuitePP = NULL;
     CU_pSuite pSuitePPPC = NULL;
+    CU_pSuite pSuitePW = NULL;
     CU_pSuite pSuiteNB = NULL;
 
     /* initialize the CUnit test registry */
@@ -405,6 +469,21 @@ int main()
         CU_cleanup_registry();
         return CU_get_error();
     }
+
+    /*_____________________PW________________________________________*/
+    pSuitePW = CU_add_suite("Suite_6 BL - PW", init_suite_PPPC, clean_suite);
+    if (NULL == pSuitePW) {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+    if ((NULL == CU_add_test(pSuitePW, "Riempi Buffer", test_RiempiBuffer)) ||
+        (NULL == CU_add_test(pSuitePW, "PW", test_PW)))
+    {
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
 
     /*_____________________NB-più produttori_più consumatori________________________________________*/
     pSuiteNB = CU_add_suite("Suite_1 NB -", init_suite_B1, clean_suite);
