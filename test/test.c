@@ -22,7 +22,7 @@ int clean_suite(void)
         return 0;
     }
     else {
-        return 1;
+        return -1;
     }
 }
 
@@ -46,25 +46,11 @@ void test_P1BE(void)
     }
 }
 
-//• (P=1; C=0; N=1) Produzione in un buffer pieno
-void test_P1BF(void) {
-    if (NULL != buffer) {
-        //TODO
-    }
-}
-
 //• (P=0; C=1; N=1) Consumazione di un solo messaggio da un buffer pieno
 void test_C1N1(void){
     if (NULL != buffer) {
         get_bloccante(buffer);
         CU_ASSERT(0 == buffer->k)
-    }
-}
-
-//• (P=0; C=1; N=1) Consumazione da un buffer vuoto
-void test_C1BE(void) {
-    if (NULL != buffer) {
-        //TODO
     }
 }
 

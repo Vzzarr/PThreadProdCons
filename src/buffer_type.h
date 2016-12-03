@@ -14,6 +14,7 @@ typedef struct buffer {
     int size;
 
     pthread_mutex_t mutex;
+
     pthread_cond_t notEmpty;
     pthread_cond_t notFull;
 

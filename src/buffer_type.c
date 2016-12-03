@@ -14,20 +14,25 @@ buffer_t* buffer_init(unsigned int maxsize){
     new_buffer->buffer_init = buffer_init;
     new_buffer->buffer_destroy = buffer_destroy;
 
-    (&new_buffer->mutex, NULL);
-    pthread_cond_init(&new_buffer->notEmpty, NULL);
-    pthread_cond_init(&new_buffer->notFull, NULL);
+    pthread_mutex_init(&(new_buffer->mutex), NULL);
+    pthread_cond_init(&(new_buffer->notEmpty), NULL);
+    pthread_cond_init(&(new_buffer->notFull), NULL);
 
     return new_buffer;
 }
 
 void buffer_destroy(buffer_t* buffer){
+    pthread_mutex_destroy(&(buffer->mutex));
     for (int i = 0; i < buffer->size; ++i)
         buffer->cells[i].msg_destroy;
+    free(buffer->cells);
     free(buffer);
 }
 
 msg_t* put_bloccante(buffer_t* buffer, msg_t* msg){
+    if(msg == NULL)
+        return BUFFER_ERROR;
+
     pthread_mutex_lock(&(buffer->mutex));
 
     while (buffer->k == buffer->size)
@@ -52,6 +57,8 @@ void* do_put_bloccante(void* arguments){
 // altrimenti effettua l’inserimento e restituisce il messaggio
 // inserito; N.B.: msg!=null
 msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg){
+    if(msg == NULL)
+        return BUFFER_ERROR;
     pthread_mutex_lock(&(buffer->mutex));
     if (buffer->k == buffer->size){
         pthread_mutex_unlock(&buffer->mutex);
