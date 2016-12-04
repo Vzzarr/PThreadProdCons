@@ -1,0 +1,21 @@
+Nella soluzione del progetto sono implementate rispettivamente
+1-msg_t* put_bloccante(buffer_t* buffer, msg_t* msg)	msg_t* get_bloccante(buffer_t* buffer)
+2-void* do_put_bloccante(void* arguments)	void* do_get_bloccante(void* arguments)
+3-msg_t* put_non_bloccante(buffer_t* buffer, msg_t* msg)	msg_t* get_non_bloccante(buffer_t* buffer)
+4-void* do_put_non_bloccante(void* arguments)	void* do_get_non_bloccante(void* arguments)
+Le prime due funzioni permettono di inserire ed estrarre un messaggio nel buffer in modo bloccante, seguendo la struttura dei monitor; infatti lettura e scrittura sul buffer risulteranno seriali su di esso.
+Le seconde due funzioni sono solo delle funzioni di supporto per il testing, necesarie per quando viene invocata la funzione int pthread_create(pthread_t *thread, const pthread_attr_t *attr,void *(*start_routine) (void *), void *arg) che permette di dare un unico input alla funzione richiamata e pertanto si sfrutta una struct per passare due parametri.
+Le terze due funzioni servono ad implementare scrittura e lettura non bloccanti sul buffer, ossia quando c'è una scrittura su un buffer pieno o una lettura da un buffer vuoto, anziché mettersi in attesa del verificarsi dell'evento che sbloccherà l'attesa stessa, si preferisce piuttosto sollevare un errore.
+Le ultime due funzioni, analogamente alle seconde hanno una funzione di supporto per il testing, stavolta applicate alle funzioni non bloccanti.
+
+Le Suite di testing sono invece così strutturate:
+1-test basilare in cui si controlla se la dimensione del buffer creato è quella richiesta
+2-test semplice in cui si inserisce in buffer unitario vuoto e si estrae, controllando che il messaggio estratto sia quello precedentemente inserito
+3-test in cui si lanciano concorrentemente un produttore e un consumatore su un buffer unitario vuoto; rispettivamente nel 1° test viene lanciato prima il produttore, nel secondo il consumatore (senza fare assunzioni sulle sequenze di interleaving)
+4-nel primo test vengono eseguiti due produttori su un buffer di dimenione 3, nel secondo ne viene lanciato un terzo per riempirlo
+5-vengono lanciati concorrentemente nell'ordine prima tre produttori e poi due consumatori su un buffer di dimensione 2; in questo modo, nella sequenza di interleaving più probabile (ma non si verificherà sempre) i primi due produttori rimpiranno il buffer e il terzo si metterà in wait. A quel punto poiché arriva un consumatore che legge un messaggio dal buffer, manderà una signal al produttore che era in attesa, segnalandogli la possibilità di inserire un messaggio nel buffer
+6-nel primo test viene saturato il buffer, nel secondo vengono messi quindi 2 produttori in attesa (nella sequenza di interleaving più probabile, ma non si verificherà sempre); per dimostrare che efffettivamente erano in attesa, vegono quindi lanciati due consumatori (concorrentmente ai due produttori) che soncumando sbloccheranno i due produttori dal blocco in cui si trovavano
+1 NB- nel primo vengono lanciati concorrentemente tre produttori non bloccanti, così che due di quei produttori sollevino un errore (non si può fare nessuna assunzione su quale sia il produttore che non contiene errore). Analogamente viene fatta la stessa cosa con i consumatori
+
+
+

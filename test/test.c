@@ -36,20 +36,36 @@ void test_bufferSize(void)
 
 /*_____________________________________________________________*/
 //•1 (P=1; C=0; N=1) Produzione di un solo messaggio in un buffer vuoto
-void test_P1BE(void)
-{
+void test_P1BE(void){
     msg_t* m = msg_init_string("Mario");
+
+    struct arg_struct ar;
+    ar.msg = m;
+    ar.buffer = buffer;
+
+    pthread_t p;
+
     if (NULL != buffer) {
         CU_ASSERT(0 == buffer->k);
-        put_bloccante(buffer, m);
+        pthread_create(&p, NULL, do_put_bloccante, &ar);
+        pthread_join(p, NULL);
         CU_ASSERT(1 == buffer->k);
     }
 }
 
 //• (P=0; C=1; N=1) Consumazione di un solo messaggio da un buffer pieno
 void test_C1N1(void){
+    msg_t* m;
+
+    struct arg_struct ar;
+    ar.buffer = buffer;
+    pthread_t c;
+
     if (NULL != buffer) {
-        get_bloccante(buffer);
+        CU_ASSERT(1 == buffer->k);
+        pthread_create(&c, NULL, do_get_bloccante, &ar);
+        pthread_join(c, &m);
+        CU_ASSERT_STRING_EQUAL(m->content, "Mario");
         CU_ASSERT(0 == buffer->k)
     }
 }
@@ -221,7 +237,7 @@ void test_PPPC(void)    //non possono essere fatte assunzioni sui messaggi letti
 /*__________________________6___________________________________*/
 
 //• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer vuoto; il buffer si satura in corso
-int test_RiempiBuffer(void)   //più produttori_più consumatori
+void test_RiempiBuffer(void)   //più produttori_più consumatori
 {
     msg_t* m1 = msg_init_string("MARIO");
 
@@ -249,7 +265,7 @@ int test_RiempiBuffer(void)   //più produttori_più consumatori
 }
 
 //• (P>1; C=0; N>1) Produzione concorrente di molteplici messaggi in un buffer pieno; il buffer è già saturo
-int test_PW(void)   //più produttori_più consumatori
+void test_PW(void)   //più produttori_più consumatori
 {
     msg_t* m1 = msg_init_string("MARIO");
 
@@ -285,7 +301,6 @@ int test_PW(void)   //più produttori_più consumatori
         CU_ASSERT(buffer->k == 2);
     }
 }
-//• (P=0; C>1; N>1) Consumazione concorrente di molteplici messaggi da un buffer pieno
 
 
 
@@ -363,7 +378,6 @@ void test_NB_PC(void)   //più consumatori, di cui uno tenta di leggere a buffer
     }
 }
 
-/*_____________________________________________________________*/
 
 
 
@@ -492,12 +506,3 @@ int main()
     CU_cleanup_registry();
     return CU_get_error();
 }
-/*
-
-
-
-
-
-• (P>1; C>1; N=1) Consumazioni e produzioni concorrenti di molteplici messaggi in un buffer unitario
-• (P>1; C>1; N>1) Consumazioni e produzioni concorrenti di molteplici messaggi in un buffer
- */
